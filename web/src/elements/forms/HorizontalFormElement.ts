@@ -4,9 +4,10 @@ import type { FormGroup } from "@goauthentik/elements/forms/FormGroup";
 import { formatSlug } from "@goauthentik/elements/router/utils.js";
 
 import { msg, str } from "@lit/localize";
-import { CSSResult, css } from "lit";
+import { CSSResult, css, nothing } from "lit";
 import { TemplateResult, html } from "lit";
 import { customElement, property } from "lit/decorators.js";
+import { ifDefined } from "lit/directives/if-defined.js";
 
 import PFForm from "@patternfly/patternfly/components/Form/form.css";
 import PFFormControl from "@patternfly/patternfly/components/FormControl/form-control.css";
@@ -67,6 +68,9 @@ export class HorizontalFormElement extends AKElement {
             `,
         ];
     }
+
+    @property({ type: String, reflect: false })
+    fieldID?: string;
 
     @property()
     label = "";
@@ -152,31 +156,33 @@ export class HorizontalFormElement extends AKElement {
         this.updated();
         return html`<div class="pf-c-form__group">
             <div class="pf-c-form__group-label">
-                <label class="pf-c-form__label">
+                <label class="pf-c-form__label" for="${ifDefined(this.fieldID)}">
                     <span class="pf-c-form__label-text">${this.label}</span>
                     ${this.required
                         ? html`<span class="pf-c-form__label-required" aria-hidden="true">*</span>`
-                        : html``}
+                        : nothing}
                 </label>
             </div>
             <div class="pf-c-form__group-control">
                 ${this.writeOnly && !this.writeOnlyActivated
                     ? html`<div class="pf-c-form__horizontal-group">
                           <input
+                              aria-label="${this.label}"
+                              id="${ifDefined(this.fieldID)}"
                               class="pf-c-form-control"
                               type="password"
                               disabled
                               value="**************"
                           />
                       </div>`
-                    : html``}
+                    : nothing}
                 <slot class="pf-c-form__horizontal-group"></slot>
                 <div class="pf-c-form__horizontal-group">
                     ${this.writeOnly
                         ? html`<p class="pf-c-form__helper-text" aria-live="polite">
                               ${msg("Click to change value")}
                           </p>`
-                        : html``}
+                        : nothing}
                     ${this.errorMessages.map((message) => {
                         if (message instanceof Object) {
                             return html`${Object.entries(message).map(([field, errMsg]) => {

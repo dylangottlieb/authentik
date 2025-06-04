@@ -1,20 +1,18 @@
 /* eslint-disable react-hooks/rules-of-hooks */
-import { LandmarksFixture } from "#e2e/fixtures/landmarks";
-import { ProvidersListFixture } from "#e2e/fixtures/providers-list";
-import { SessionFixture } from "#e2e/fixtures/session";
-import { UserLibraryFixture } from "#e2e/fixtures/user-library";
+import { LandmarksFixture } from "#e2e/fixtures/LandmarksFixture";
+import { ProvidersFixture } from "#e2e/fixtures/ProvidersFixture";
+import { SessionFixture } from "#e2e/fixtures/SessionFixture";
+import { UserLibraryFixture } from "#e2e/fixtures/UserLibraryFixture";
 import { test as base } from "@playwright/test";
-
-import { TodoPage } from "./todo-page.js";
 
 export { expect } from "@playwright/test";
 
-type E2EFixtures = {
-    session: SessionFixture;
-    providersList: ProvidersListFixture;
-    userLibrary: UserLibraryFixture;
+interface E2EFixtures {
     landmarks: LandmarksFixture;
-};
+    session: SessionFixture;
+    providers: ProvidersFixture;
+    userLibrary: UserLibraryFixture;
+}
 
 export const test = base.extend<E2EFixtures>({
     landmarks: async ({ page }, use, { title }) => {
@@ -25,7 +23,11 @@ export const test = base.extend<E2EFixtures>({
         await use(new SessionFixture(page, title));
     },
 
-    userLibrary: async ({ page }, use) => {
-        await use(new UserLibraryFixture(page));
+    providers: async ({ page }, use, { title }) => {
+        await use(new ProvidersFixture(page, title));
+    },
+
+    userLibrary: async ({ page }, use, { title }) => {
+        await use(new UserLibraryFixture(page, title));
     },
 });
